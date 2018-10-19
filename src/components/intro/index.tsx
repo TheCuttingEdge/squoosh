@@ -89,7 +89,7 @@ export default class Intro extends Component<Props, State> {
         <div>
           <div class={style.logoSizer}>
             <div class={style.logoContainer}>
-              <img src={logo} class={style.logo} alt="Squoosh" />
+              <img src={logo} class={style.logo} alt="Squoosh" decoding="async" />
             </div>
           </div>
           <p class={style.openImageGuide}>
@@ -110,7 +110,7 @@ export default class Intro extends Component<Props, State> {
                   <div class={style.demo}>
                     <div class={style.demoImgContainer}>
                       <div class={style.demoImgAspect}>
-                        <img class={style.demoIcon} src={demo.iconUrl} alt=""/>
+                        <img class={style.demoIcon} src={demo.iconUrl} alt="" decoding="async" />
                         {fetchingDemoIndex === i &&
                           <div class={style.demoLoading}>
                             <loading-spinner class={style.demoLoadingSpinner}/>

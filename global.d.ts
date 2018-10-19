@@ -12,6 +12,9 @@ declare interface Window {
 declare namespace JSX {
   interface Element { }
   interface IntrinsicElements { }
+  interface HTMLAttributes {
+    decoding?: string;
+  }
 }
 
 declare module 'classnames' {
