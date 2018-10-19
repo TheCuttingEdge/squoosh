@@ -231,7 +231,10 @@ module.exports = function (_, env) {
       }),
 
       new ScriptExtHtmlPlugin({
-        defaultAttribute: 'async'
+        defaultAttribute: 'async',
+        preload: [
+          /.*/
+        ]
       }),
 
       // Inline constants during build, so they can be folded by UglifyJS.
