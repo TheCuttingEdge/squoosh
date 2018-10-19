@@ -12,6 +12,7 @@ const ReplacePlugin = require('webpack-plugin-replace');
 const CopyPlugin = require('copy-webpack-plugin');
 const WatchTimestampsPlugin = require('./config/watch-timestamps-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const CrittersPlugin = require('critters-webpack-plugin');
 
 function readJson (filename) {
   return JSON.parse(fs.readFileSync(filename));
@@ -216,7 +217,7 @@ module.exports = function (_, env) {
       // For now we're not doing SSR.
       new HtmlPlugin({
         filename: path.join(__dirname, 'build/index.html'),
-        template: 'src/index.html',
+        template: '!!prerender-loader?string!src/index.html',
         minify: isProd && {
           collapseWhitespace: true,
           removeScriptTypeAttributes: true,
@@ -262,6 +263,13 @@ module.exports = function (_, env) {
         analyzerMode: 'static',
         defaultSizes: 'gzip',
         openAnalyzer: false
+      }),
+
+      // Inline Critical CSS (for the intro screen, essentially):
+      isProd && new CrittersPlugin({
+        preload: 'media',
+        inlineFonts: false,
+        preloadFonts: false
       })
     ].filter(Boolean), // Filter out any falsey plugin array entries.
 
