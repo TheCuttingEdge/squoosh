@@ -271,7 +271,7 @@ module.exports = function (_, env) {
       // Inline Critical CSS (for the intro screen, essentially):
       isProd && new CrittersPlugin({
         preload: 'media',
-        inlineFonts: false,
+        inlineFonts: true,
         preloadFonts: false
       })
     ].filter(Boolean), // Filter out any falsey plugin array entries.
