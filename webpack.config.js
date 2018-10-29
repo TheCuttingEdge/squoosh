@@ -226,12 +226,12 @@ module.exports = function (_, env) {
           removeComments: true
         },
         manifest: readJson('./src/manifest.json'),
-        inject: true,
+        inject: 'head',
         compile: true
       }),
 
       new ScriptExtHtmlPlugin({
-        defaultAttribute: 'async',
+        defaultAttribute: 'defer',
         preload: [
           /.*/
         ]
