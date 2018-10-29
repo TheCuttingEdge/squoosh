@@ -1,7 +1,8 @@
 import { h, Component } from 'preact';
 import linkState from 'linkstate';
-import { bind, inputFieldValueAsNumber } from '../../lib/util';
-import { ResizeOptions } from './resize';
+import { bind } from '../../lib/initial-util';
+import { inputFieldValueAsNumber } from '../../lib/util';
+import { ResizeOptions } from './processor-meta';
 
 interface Props {
   isVector: Boolean;

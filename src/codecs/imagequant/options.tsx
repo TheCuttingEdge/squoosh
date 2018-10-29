@@ -1,6 +1,7 @@
 import { h, Component } from 'preact';
-import { bind, inputFieldValueAsNumber, konami } from '../../lib/util';
-import { QuantizeOptions } from './quantizer';
+import { bind } from '../../lib/initial-util';
+import { inputFieldValueAsNumber, konami } from '../../lib/util';
+import { QuantizeOptions } from './processor-meta';
 
 const konamiPromise = konami();
 

@@ -1,30 +1,3 @@
-/**
- * A decorator that binds values to their class instance.
- * @example
- * class C {
- *   @bind
- *   foo () {
- *     return this;
- *   }
- * }
- * let f = new C().foo;
- * f() instanceof C;    // true
- */
-export function bind(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-  return {
-    // the first time the prototype property is accessed for an instance,
-    // define an instance property pointing to the bound function.
-    // This effectively "caches" the bound prototype method as an instance property.
-    get() {
-      const bound = descriptor.value.bind(this);
-      Object.defineProperty(this, propertyKey, {
-        value: bound,
-      });
-      return bound;
-    },
-  };
-}
-
 /** Compare two objects, returning a boolean indicating if
  *  they have the same properties and strictly equal values.
  */
@@ -32,22 +5,6 @@ export function shallowEqual(one: any, two: any) {
   for (const i in one) if (one[i] !== two[i]) return false;
   for (const i in two) if (!(i in one)) return false;
   return true;
-}
-
-/** Creates a function ref that assigns its value to a given property of an object.
- *  @example
- *  // element is stored as `this.foo` when rendered.
- *  <div ref={linkRef(this, 'foo')} />
- */
-export function linkRef<T>(obj: any, name: string) {
-  const refName = `$$ref_${name}`;
-  let ref = obj[refName];
-  if (!ref) {
-    ref = obj[refName] = (c: T) => {
-      obj[name] = c;
-    };
-  }
-  return ref;
 }
 
 /** Replace the contents of a canvas with the given data */
@@ -73,7 +30,28 @@ export async function canvasEncode(data: ImageData, type: string, quality?: numb
   if (!ctx) throw Error('Canvas not initialized');
   ctx.putImageData(data, 0, 0);
 
-  const blob = await new Promise<Blob | null>(r => canvas.toBlob(r, type, quality));
+  let blob: Blob | null;
+
+  if ('toBlob' in canvas) {
+    blob = await new Promise<Blob | null>(r => canvas.toBlob(r, type, quality));
+  } else {
+    // Welcome to Edge.
+    // TypeScript thinks `canvas` is 'never', so it needs casting.
+    const dataUrl = (canvas as HTMLCanvasElement).toDataURL(type, quality);
+    const result = /data:([^;]+);base64,(.*)$/.exec(dataUrl);
+
+    if (!result) throw Error('Data URL reading failed');
+
+    const outputType = result[1];
+    const binaryStr = atob(result[2]);
+    const data = new Uint8Array(binaryStr.length);
+
+    for (let i = 0; i < data.length; i += 1) {
+      data[i] = binaryStr.charCodeAt(i);
+    }
+
+    blob = new Blob([data], { type: outputType });
+  }
 
   if (!blob) throw Error('Encoding failed');
   return blob;
@@ -133,18 +111,20 @@ export async function blobToImg(blob: Blob): Promise<HTMLImageElement> {
     const img = new Image();
     img.decoding = 'async';
     img.src = url;
+    const loaded = new Promise((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = () => reject(Error('Image loading error'));
+    });
 
     if (img.decode) {
-      // Nice off-thread way supported in at least Safari.
-      await img.decode();
-    } else {
-      // Main thread decoding :(
-      await new Promise((resolve, reject) => {
-        img.onload = () => resolve();
-        img.onerror = () => reject(Error('Image loading error'));
-      });
+      // Nice off-thread way supported in Safari/Chrome.
+      // Safari throws on decode if the source is SVG.
+      // https://bugs.webkit.org/show_bug.cgi?id=188347
+      await img.decode().catch(() => null);
     }
 
+    // Always await loaded, as we may have bailed due to the Safari bug above.
+    await loaded;
     return img;
   } finally {
     URL.revokeObjectURL(url);
@@ -262,12 +242,4 @@ export function konami(): Promise<void> {
 
     window.addEventListener('keydown', listener);
   });
-}
-
-// Edge doesn't support `new File`, so here's a hacky alternative.
-// https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/9551546/
-export class Fileish extends Blob {
-  constructor(data: any[], public name: string, opts?: BlobPropertyBag) {
-    super(data, opts);
-  }
 }

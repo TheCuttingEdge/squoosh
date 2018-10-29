@@ -1,6 +1,7 @@
 import { h, Component } from 'preact';
-import { bind, inputFieldChecked, inputFieldValueAsNumber } from '../../lib/util';
-import { EncodeOptions, MozJpegColorSpace } from './encoder';
+import { bind } from '../../lib/initial-util';
+import { inputFieldChecked, inputFieldValueAsNumber } from '../../lib/util';
+import { EncodeOptions, MozJpegColorSpace } from './encoder-meta';
 import '../../custom-els/RangeInput';
 
 type Props = {
