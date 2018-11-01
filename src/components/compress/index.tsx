@@ -186,6 +186,8 @@ export default class Compress extends Component<Props, State> {
     super(props);
     this.widthQuery.addListener(this.onMobileWidthChange);
     this.updateFile(props.file);
+
+    navigator.serviceWorker.register('../../sw');
   }
 
   @bind
