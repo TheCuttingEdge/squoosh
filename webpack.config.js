@@ -14,6 +14,7 @@ const WatchTimestampsPlugin = require('./config/watch-timestamps-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const WorkerPlugin = require('worker-plugin');
 const AutoSWPlugin = require('./config/auto-sw-plugin');
+const AssetTemplatePlugin = require('./config/asset-template-plugin');
 
 function readJson (filename) {
   return JSON.parse(fs.readFileSync(filename));
@@ -237,7 +238,17 @@ module.exports = function (_, env) {
         compile: true
       }),
 
-      new AutoSWPlugin({}),
+      isProd && new AutoSWPlugin({}),
+
+      isProd && new AssetTemplatePlugin({
+        template: path.join(__dirname, '_headers.ejs'),
+        filename: '_headers',
+      }),
+
+      isProd && new AssetTemplatePlugin({
+        template: path.join(__dirname, '_redirects.ejs'),
+        filename: '_redirects',
+      }),
 
       new ScriptExtHtmlPlugin({
         defaultAttribute: 'async'
