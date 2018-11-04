@@ -230,10 +230,7 @@ module.exports = function (_, env) {
       }),
 
       new ScriptExtHtmlPlugin({
-        defaultAttribute: 'defer',
-        preload: [
-          /.*/
-        ]
+        defaultAttribute: 'defer'
       }),
 
       // Inline constants during build, so they can be folded by UglifyJS.
@@ -269,8 +266,6 @@ module.exports = function (_, env) {
 
       // Inline Critical CSS (for the intro screen, essentially)
       isProd && new CrittersPlugin({
-        // use <link rel="stylesheet" media="not x" onload="this.media='all'"> hack to load async css:
-        preload: 'media',
         // inline all styles from any stylesheet below this size:
         inlineThreshold: 2000,
         // don't bother lazy-loading non-critical stylesheets below this size, just inline the non-critical styles too:
