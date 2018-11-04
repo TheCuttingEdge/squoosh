@@ -267,10 +267,19 @@ module.exports = function (_, env) {
         openAnalyzer: false
       }),
 
-      // Inline Critical CSS (for the intro screen, essentially):
+      // Inline Critical CSS (for the intro screen, essentially)
       isProd && new CrittersPlugin({
+        // use <link rel="stylesheet" media="not x" onload="this.media='all'"> hack to load async css:
         preload: 'media',
+        // inline all styles from any stylesheet below this size:
+        inlineThreshold: 2000,
+        // don't bother lazy-loading non-critical stylesheets below this size, just inline the non-critical styles too:
+        minimumExternalSize: 4000,
+        // don't emit <noscript> external stylesheet links since the app fundamentally requires JS anyway:
+        noscriptFallback: false,
+        // inline the tiny data URL fonts we have for the intro screen:
         inlineFonts: true,
+        // (and don't lazy load them):
         preloadFonts: false
       })
     ].filter(Boolean), // Filter out any falsey plugin array entries.
